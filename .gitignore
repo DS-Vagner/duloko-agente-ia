@@ -16,7 +16,7 @@ __pycache__/
 .pytest_cache/
 
 # Índice vetorial gerado localmente (recriado com scripts/build_index.py)
-index/
+#index/
 
 # OS
 .DS_Store
