@@ -44,6 +44,12 @@ def generate_answer(question: str, context_chunks: List[str]) -> str:
             {"role": "user", "content": user_message},
         ],
         temperature=0.2,
-        max_tokens=700,
+        max_tokens=1500,
+        reasoning_effort="low",  # reduz o "pensamento" interno do modelo, deixando
+        # mais espaço de tokens livre para a resposta final (evita respostas vazias).
     )
-    return completion.choices[0].message.content
+    answer = completion.choices[0].message.content
+    if not answer:
+        # fallback defensivo: se ainda assim vier vazio, evita mostrar tela em branco.
+        return "Não consegui gerar uma resposta completa dessa vez. Tente reformular a pergunta ou pergunte novamente."
+    return answer
