@@ -30,7 +30,7 @@ INDEX_DIR.mkdir(parents=True, exist_ok=True)
 
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "900"))        # caracteres por chunk
 CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", "150"))  # sobreposição entre chunks
-TOP_K = int(os.getenv("TOP_K", "5"))                     # nº de chunks recuperados por pergunta
+TOP_K = int(os.getenv("TOP_K", "8"))                     # nº de chunks recuperados por pergunta
 
 # --- Identidade do agente -------------------------------------------------
 NOME_LOJA = "DuLoko"

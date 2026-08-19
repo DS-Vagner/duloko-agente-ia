@@ -60,7 +60,7 @@ Os documentos se referenciam entre si (ex: garantia aponta para devolução, afi
 
 **Por que essa combinação?**
 - **Embeddings locais (sentence-transformers)**: rodam de graça, sem limite de requisições e sem depender de uma segunda API — só usam CPU.
-- **Groq para o chat**: modelo Llama 3.3 70B, tier gratuito generoso, respostas rápidas.
+- **Groq para o chat**: modelo openai/gpt-oss-20b, tier gratuito generoso, respostas rápidas.
 - **FAISS**: índice vetorial leve, persistido em disco — não precisa reprocessar os PDFs a cada reinício.
 - **Streamlit**: interface de chat pronta, com deploy simples tanto localmente quanto na nuvem.
 
@@ -72,7 +72,7 @@ Os documentos se referenciam entre si (ex: garantia aponta para devolução, afi
 |---|---|
 | Linguagem | Python 3.11+ |
 | Interface | Streamlit |
-| LLM (geração de respostas) | Groq API — `llama-3.3-70b-versatile` |
+| LLM (geração de respostas) | Groq API — `openai/gpt-oss-20b` |
 | Embeddings | sentence-transformers (`paraphrase-multilingual-MiniLM-L12-v2`), local |
 | Banco vetorial | FAISS (`faiss-cpu`) |
 | Leitura de PDF | pypdf |
@@ -172,7 +172,7 @@ O agente foi publicado em uma **VM Compute (Always Free tier)** da Oracle Cloud 
 5. Acessar pelo IP público da instância: `http://SEU-IP-PUBLICO:8501`.
 
 **Evidência do deploy:** _(preencher após publicar)_
-- 🔗 URL pública: `http://SEU-IP-AQUI:8501`
+- 🔗 URL pública: `Ainda não publicada`
 - 📸 Captura de tela: `docs/prints/deploy-oci.png`
 
 ---

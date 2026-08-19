@@ -41,8 +41,15 @@ def _split_text(text: str, chunk_size: int, overlap: int) -> List[str]:
 def load_pdf(path: Path) -> str:
     reader = PdfReader(str(path))
     pages_text = [page.extract_text() or "" for page in reader.pages]
-    return "\n".join(pages_text)
+    full_text = "\n".join(pages_text)
+    return _strip_table_of_contents(full_text)
 
+
+def _strip_table_of_contents(text: str) -> str:
+    marker = text.find("---")
+    if 0 < marker < 2000:
+        return text[marker + 3:]
+    return text
 
 def load_csv(path: Path) -> str:
     """Converte cada linha do CSV em uma frase 'coluna: valor'."""
