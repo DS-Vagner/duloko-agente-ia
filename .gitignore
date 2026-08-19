@@ -1,0 +1,22 @@
+# Segredos
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+
+# Ambiente
+.venv/
+venv/
+
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Índice vetorial gerado localmente (recriado com scripts/build_index.py)
+index/
+
+# OS
+.DS_Store
