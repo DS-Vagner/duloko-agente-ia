@@ -33,7 +33,8 @@ Os documentos se referenciam entre si (ex: garantia aponta para devolução, afi
               ▼
 ┌───────────────────────────┐
 │ 1. Leitura + Chunking       │  src/document_loader.py
-│    (pypdf, ~900 caracteres) │
+│    (pypdf, remove sumário,  │
+│    ~900 caracteres/chunk)   │
 └─────────────┬──────────────┘
               ▼
 ┌───────────────────────────┐
@@ -48,11 +49,11 @@ Os documentos se referenciam entre si (ex: garantia aponta para devolução, afi
 └─────────────┬──────────────┘
               │
    Usuário ──▶│ 4. Busca por similaridade
-   (pergunta) │    (top-5 chunks mais relevantes)
+   (pergunta) │    (top-8 chunks mais relevantes)
               ▼
 ┌───────────────────────────┐
 │ 5. Geração da resposta        │  src/llm.py + src/rag_engine.py
-│    (Groq — Llama 3.3 70B)     │
+│    (Groq — GPT-OSS 120B)      │
 └─────────────┬──────────────┘
               ▼
    Interface Streamlit (app.py) ──▶ Resposta + fontes consultadas
@@ -60,7 +61,7 @@ Os documentos se referenciam entre si (ex: garantia aponta para devolução, afi
 
 **Por que essa combinação?**
 - **Embeddings locais (sentence-transformers)**: rodam de graça, sem limite de requisições e sem depender de uma segunda API — só usam CPU.
-- **Groq para o chat**: modelo openai/gpt-oss-20b, tier gratuito generoso, respostas rápidas.
+- **Groq para o chat**: modelo `openai/gpt-oss-120b`, tier gratuito generoso, respostas rápidas.
 - **FAISS**: índice vetorial leve, persistido em disco — não precisa reprocessar os PDFs a cada reinício.
 - **Streamlit**: interface de chat pronta, com deploy simples tanto localmente quanto na nuvem.
 
@@ -72,13 +73,13 @@ Os documentos se referenciam entre si (ex: garantia aponta para devolução, afi
 |---|---|
 | Linguagem | Python 3.11+ |
 | Interface | Streamlit |
-| LLM (geração de respostas) | Groq API — `openai/gpt-oss-20b` |
+| LLM (geração de respostas) | Groq API — `openai/gpt-oss-120b` |
 | Embeddings | sentence-transformers (`paraphrase-multilingual-MiniLM-L12-v2`), local |
 | Banco vetorial | FAISS (`faiss-cpu`) |
 | Leitura de PDF | pypdf |
 | Testes | Pytest |
 | Empacotamento | Docker |
-| Deploy | Oracle Cloud Infrastructure (VM Compute — Always Free tier) |
+| Deploy | Streamlit Community Cloud |
 | Versionamento | Git / GitHub |
 
 ---
@@ -98,6 +99,7 @@ duloko-agente-ia/
 ├── scripts/
 │   └── build_index.py         # Script de ingestão (roda antes do app subir)
 ├── data/                      # Documentos fonte (PDFs da DuLoko)
+├── index/                     # Índice vetorial pré-processado (usado no deploy)
 ├── tests/
 │   └── test_agente.py         # Testes automatizados
 ├── docs/prints/                # Capturas de tela do deploy (evidência)
@@ -118,11 +120,11 @@ duloko-agente-ia/
 ### 2. Instalação local
 
 ```bash
-git clone https://github.com/SEU-USUARIO/duloko-agente-ia.git
+git clone https://github.com/DS-Vagner/duloko-agente-ia.git
 cd duloko-agente-ia
 
 python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
+.venv\Scripts\activate        # Mac/Linux: source .venv/bin/activate
 
 pip install -r requirements.txt
 
@@ -161,19 +163,16 @@ docker run -p 8501:8501 --env-file .env agente-duloko
 
 ---
 
-## ☁️ Deploy na OCI
+## ☁️ Deploy
 
-O agente foi publicado em uma **VM Compute (Always Free tier)** da Oracle Cloud Infrastructure, rodando em container Docker:
+O agente foi publicado no **Streamlit Community Cloud**, direto a partir deste repositório GitHub — a cada `git push` na branch `main`, o deploy pode ser atualizado com um "Reboot" manual do app.
 
-1. Criar uma Compute Instance gratuita (Ubuntu 22.04, forma `VM.Standard.E2.1.Micro` ou ARM `VM.Standard.A1.Flex`) no console da OCI.
-2. Liberar a porta `8501` na regra de segurança (Security List / NSG) do VCN.
-3. Na VM: instalar Docker, clonar o repositório, configurar o `.env` com a `GROQ_API_KEY`.
-4. `docker build -t agente-duloko .` e `docker run -d -p 8501:8501 --env-file .env --restart unless-stopped agente-duloko`.
-5. Acessar pelo IP público da instância: `http://SEU-IP-PUBLICO:8501`.
+O índice vetorial (pasta `index/`) já vem pré-processado e versionado no repositório, para que o app suba pronto para uso, sem precisar reprocessar os PDFs a cada reinício.
 
-**Evidência do deploy:** _(preencher após publicar)_
-- 🔗 URL pública: `Ainda não publicada`
-- 📸 Captura de tela: `docs/prints/deploy-oci.png`
+- 🔗 **URL pública:** https://duloko-agente.streamlit.app/
+- 📸 **Captura de tela:**
+
+![Agente DuLoko em funcionamento](docs/prints/deploy-streamlit.png)
 
 ---
 
@@ -191,15 +190,15 @@ O agente foi publicado em uma **VM Compute (Always Free tier)** da Oracle Cloud 
 
 **Pergunta:** *"Qual o prazo para solicitar devolução por arrependimento?"*
 
-> O cliente pode solicitar devolução por arrependimento dentro de **10 dias corridos** após o recebimento do pedido, desde que o produto cumpra os requisitos de elegibilidade (embalagem original, sem sinais de uso incompatíveis, com acessórios e manuais).
+> O prazo para solicitar a devolução por arrependimento é de até 10 dias corridos a partir do recebimento do produto, desde que o item esteja sem uso.
 >
 > **Fontes:** `reembolsos_e_devolucoes.pdf`
 
-**Pergunta:** *"Meu pedido chegou com a caixa amassada, isso é garantia ou dano de transporte?"*
+**Pergunta:** *"O frete de devolução é gratuito?"*
 
-> Se o dano foi identificado no recebimento, você deve relatar em até **48 horas**. A equipe vai avaliar se é dano em trânsito ou defeito de fábrica com base no estado da embalagem, o tipo de dano e o momento da detecção — se parecer defeito de fábrica (não relacionado ao transporte), o caso é avaliado conforme o Manual de Garantia; se for claramente dano de transporte, segue pela Política de Reembolsos e Devoluções.
+> Sim. A coleta ou devolução não terá custo para o cliente, exceto quando a causa for atribuível ao cliente (por exemplo, endereço incorreto ou não recebimento dentro da janela acordada).
 >
-> **Fontes:** `garantia_de_produtos.pdf`, `reembolsos_e_devolucoes.pdf`, `prazos_e_custos_de_envio.pdf`
+> **Fontes:** `reembolsos_e_devolucoes.pdf`, `prazos_e_custos_de_envio.pdf`
 
 **Pergunta:** *"Minha comissão de afiliado é revertida se o cliente devolver o produto?"*
 
@@ -208,6 +207,16 @@ O agente foi publicado em uma **VM Compute (Always Free tier)** da Oracle Cloud 
 > **Fontes:** `programa_de_afiliacao.pdf`, `reembolsos_e_devolucoes.pdf`
 
 > As respostas acima foram validadas manualmente com base no conteúdo real dos documentos em `data/`. O texto exato gerado pela Groq pode variar levemente a cada execução.
+
+---
+
+## 🖼️ Capturas de tela
+
+![Tela 1](docs/prints/Tela-01.png)
+![Tela 2](docs/prints/Tela-02.png)
+![Tela 3](docs/prints/Tela-03.png)
+![Tela 4](docs/prints/Tela-04.png)
+![Tela 5](docs/prints/Tela-05.png)
 
 ---
 
