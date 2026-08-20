@@ -33,8 +33,7 @@ Os documentos se referenciam entre si (ex: garantia aponta para devolução, afi
               ▼
 ┌───────────────────────────┐
 │ 1. Leitura + Chunking       │  src/document_loader.py
-│    (pypdf, remove sumário,  │
-│    ~900 caracteres/chunk)   │
+│    (pypdf, ~900 caracteres) │
 └─────────────┬──────────────┘
               ▼
 ┌───────────────────────────┐
@@ -79,7 +78,7 @@ Os documentos se referenciam entre si (ex: garantia aponta para devolução, afi
 | Leitura de PDF | pypdf |
 | Testes | Pytest |
 | Empacotamento | Docker |
-| Deploy | Streamlit Community Cloud |
+| Deploy | Oracle Cloud Infrastructure (VM Compute — Always Free tier) |
 | Versionamento | Git / GitHub |
 
 ---
@@ -99,7 +98,6 @@ duloko-agente-ia/
 ├── scripts/
 │   └── build_index.py         # Script de ingestão (roda antes do app subir)
 ├── data/                      # Documentos fonte (PDFs da DuLoko)
-├── index/                     # Índice vetorial pré-processado (usado no deploy)
 ├── tests/
 │   └── test_agente.py         # Testes automatizados
 ├── docs/prints/                # Capturas de tela do deploy (evidência)
@@ -120,11 +118,11 @@ duloko-agente-ia/
 ### 2. Instalação local
 
 ```bash
-git clone https://github.com/DS-Vagner/duloko-agente-ia.git
+git clone https://github.com/SEU-USUARIO/duloko-agente-ia.git
 cd duloko-agente-ia
 
 python -m venv .venv
-.venv\Scripts\activate        # Mac/Linux: source .venv/bin/activate
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
 
 pip install -r requirements.txt
 
@@ -174,6 +172,14 @@ O índice vetorial (pasta `index/`) já vem pré-processado e versionado no repo
 
 ![Agente DuLoko em funcionamento](docs/prints/deploy-streamlit.png)
 
+## 🖼️ Capturas de tela
+
+![Tela 1](docs/prints/Tela-01.png)
+![Tela 2](docs/prints/Tela-02.png)
+![Tela 3](docs/prints/Tela-03.png)
+![Tela 4](docs/prints/Tela-04.png)
+![Tela 5](docs/prints/Tela-05.png)
+
 ---
 
 ## 💬 Exemplos de perguntas que o agente consegue responder
@@ -190,15 +196,15 @@ O índice vetorial (pasta `index/`) já vem pré-processado e versionado no repo
 
 **Pergunta:** *"Qual o prazo para solicitar devolução por arrependimento?"*
 
-> O prazo para solicitar a devolução por arrependimento é de até 10 dias corridos a partir do recebimento do produto, desde que o item esteja sem uso.
+> O cliente pode solicitar devolução por arrependimento dentro de **10 dias corridos** após o recebimento do pedido, desde que o produto cumpra os requisitos de elegibilidade (embalagem original, sem sinais de uso incompatíveis, com acessórios e manuais).
 >
 > **Fontes:** `reembolsos_e_devolucoes.pdf`
 
-**Pergunta:** *"O frete de devolução é gratuito?"*
+**Pergunta:** *"Meu pedido chegou com a caixa amassada, isso é garantia ou dano de transporte?"*
 
-> Sim. A coleta ou devolução não terá custo para o cliente, exceto quando a causa for atribuível ao cliente (por exemplo, endereço incorreto ou não recebimento dentro da janela acordada).
+> Se o dano foi identificado no recebimento, você deve relatar em até **48 horas**. A equipe vai avaliar se é dano em trânsito ou defeito de fábrica com base no estado da embalagem, o tipo de dano e o momento da detecção — se parecer defeito de fábrica (não relacionado ao transporte), o caso é avaliado conforme o Manual de Garantia; se for claramente dano de transporte, segue pela Política de Reembolsos e Devoluções.
 >
-> **Fontes:** `reembolsos_e_devolucoes.pdf`, `prazos_e_custos_de_envio.pdf`
+> **Fontes:** `garantia_de_produtos.pdf`, `reembolsos_e_devolucoes.pdf`, `prazos_e_custos_de_envio.pdf`
 
 **Pergunta:** *"Minha comissão de afiliado é revertida se o cliente devolver o produto?"*
 
@@ -207,16 +213,6 @@ O índice vetorial (pasta `index/`) já vem pré-processado e versionado no repo
 > **Fontes:** `programa_de_afiliacao.pdf`, `reembolsos_e_devolucoes.pdf`
 
 > As respostas acima foram validadas manualmente com base no conteúdo real dos documentos em `data/`. O texto exato gerado pela Groq pode variar levemente a cada execução.
-
----
-
-## 🖼️ Capturas de tela
-
-![Tela 1](docs/prints/Tela-01.png)
-![Tela 2](docs/prints/Tela-02.png)
-![Tela 3](docs/prints/Tela-03.png)
-![Tela 4](docs/prints/Tela-04.png)
-![Tela 5](docs/prints/Tela-05.png)
 
 ---
 
